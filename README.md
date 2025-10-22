@@ -8,7 +8,7 @@ MONTI (Multi-Omics Non-negative Tensor decomposition for Integrative analysis) i
 ### Pipeline overview
 
 ```
-TCGA data → MONTI preprocessing → gene-level matrices → tensor.npy → MOPA
+TCGA data → MONTI preprocessing → gene-level matrices → tensor.rds → MOPA
 ```
 
 The repository is organised as follows:
@@ -29,15 +29,8 @@ config/config.yml   # Pipeline configuration
    Rscript install_dependencies.R
    ```
 
-   The script installs `TCGAbiolinks`, `minfi`, `limma`, `edgeR`, `preprocessCore`, `reticulate`, and `yaml` through Bioconductor/CRAN.
-
-2. **Python packages** – required for tensor construction.
-
-   ```bash
-   python3 -m pip install numpy pandas pyyaml
-   ```
-
-   (Optional) configure `reticulate` to use the same Python environment by setting `RETICULATE_PYTHON` before running the R scripts.
+   The script installs `TCGAbiolinks`, `minfi`, `limma`, `edgeR`, `preprocessCore`, and `yaml` through Bioconductor/CRAN.
+   No Python environment is required.
 
 3. **Metadata resources** – the gene-centric conversion relies on ancillary mapping tables distributed with MONTI:
 
@@ -63,7 +56,7 @@ config/config.yml   # Pipeline configuration
    Rscript pipelines/generate_gene_level.R config/config.yml
    ```
 
-   This step calls `make_methylation_gcentric` and `make_mir_gcentric` from the Python `src/monti.py` module (through `reticulate`). Expression, methylation, and miRNA matrices are log2-transformed, quantile-normalised, and min–max scaled to [0, 1]. Harmonised matrices covering the intersecting genes and samples are stored under `output/`:
+   This step converts methylation and miRNA measurements to gene-level matrices using native R implementations of the MONTI utilities. Expression, methylation, and miRNA matrices are log2-transformed, quantile-normalised, and min–max scaled to [0, 1]. Harmonised matrices covering the intersecting genes and samples are stored under `output/`:
 
    - `gene_expression_matrix.tsv`
    - `gene_methylation_matrix.tsv`
@@ -72,14 +65,29 @@ config/config.yml   # Pipeline configuration
 3. **Build the MOPA tensor**.
 
    ```bash
-   python pipelines/build_tensor.py --config config/config.yml
+   Rscript pipelines/build_tensor.R config/config.yml
    ```
 
-   The script stacks the three matrices into `output/tensor.npy`, writes `output/genelist.txt`, and records the sample IDs in `output/samplelist.txt`.
+   The script stacks the three matrices into a 3D tensor saved as `output/tensor.rds` and records the intersecting gene list in `output/genelist.txt`.
 
 ### Outputs
 
-The processed artefacts in `output/` are ready for downstream tensor decomposition or pathway analysis with MOPA. Every run is controlled through `config/config.yml`, which exposes the TCGA project identifier, download parameters, raw input paths, and output filenames.
+The processed artefacts in `output/` are ready for downstream tensor decomposition or pathway analysis with MOPA. Every run is controlled through `config/config.yml`, which exposes the TCGA project identifier, download parameters, raw input paths, and output filenames. The directory will contain:
+
+```
+output/
+├─ gene_expression_matrix.tsv
+├─ gene_methylation_matrix.tsv
+├─ gene_miRNA_matrix.tsv
+├─ tensor.rds
+└─ genelist.txt
+```
+
+Load the tensor in R with:
+
+```r
+tensor <- readRDS("output/tensor.rds")
+```
 
 Below is an illustration of the analysis workflow of MONTI.
 ![workflow](./images/monti_workflow.jpg)

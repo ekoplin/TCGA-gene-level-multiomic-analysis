@@ -7,10 +7,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 
 BiocManager::install(c("TCGAbiolinks", "minfi", "limma", "edgeR", "preprocessCore"), update = FALSE, ask = FALSE)
 
-if (!requireNamespace("reticulate", quietly = TRUE)) {
-  install.packages("reticulate")
-}
-
 if (!requireNamespace("yaml", quietly = TRUE)) {
   install.packages("yaml")
 }
