@@ -13,3 +13,6 @@
 *.RDS
 *.npy
 *.npz
+
+# Python environments
+venv/

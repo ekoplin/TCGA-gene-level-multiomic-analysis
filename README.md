@@ -150,6 +150,11 @@ If the GitHub web interface still lists this project as "forked from inukj/MONTI
 
 
 
+## Branch restoration notice
+
+Restored the Python implementation of the MONTI pipeline on branch `codex/create-tcga-multi-omics-data-pipeline` to maintain compatibility with the original non-negative tensor decomposition methods.
+
+
 
 
 
