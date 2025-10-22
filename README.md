@@ -3,7 +3,83 @@ https://www.frontiersin.org/articles/10.3389/fgene.2021.682841/abstract
 
 Multi-omics data is frequently measured to characterize biological mechanisms underlying phenotypes. Complex relationships in multi-omics data, if mined, can lead to more accurate classification of patient samples according to the phenotypes.
 
-MONTI (Multi-Omics Non-negative Tensor decomposition for Integrative analysis) is a tool that can be used to integrate and analyze large sets of multi-omics data. MONTI identifies gene regulatory multi-omics features specific to a group of samples that share a common biological trait.
+MONTI (Multi-Omics Non-negative Tensor decomposition for Integrative analysis) is a tool that can be used to integrate and analyze large sets of multi-omics data. MONTI identifies gene regulatory multi-omics features specific to a group of samples that share a common biological trait. This repository extends the original MONTI code base with a reproducible pipeline that downloads The Cancer Genome Atlas (TCGA) data, converts every omics layer into the MONTI gene-centric representation, and exports MOPA-ready tensors.
+
+### Pipeline overview
+
+```
+TCGA data → MONTI preprocessing → gene-level matrices → tensor.npy → MOPA
+```
+
+The repository is organised as follows:
+
+```
+src/                # Original MONTI python package
+pipelines/          # Orchestrated data engineering scripts
+data/               # Raw downloads (git-ignored)
+output/             # Gene-level matrices and tensors (git-ignored)
+config/config.yml   # Pipeline configuration
+```
+
+### Environment setup
+
+1. **R packages** – required for downloading TCGA data and for quantile normalisation.
+
+   ```bash
+   Rscript install_dependencies.R
+   ```
+
+   The script installs `TCGAbiolinks`, `minfi`, `limma`, `edgeR`, `preprocessCore`, `reticulate`, and `yaml` through Bioconductor/CRAN.
+
+2. **Python packages** – required for tensor construction.
+
+   ```bash
+   python3 -m pip install numpy pandas pyyaml
+   ```
+
+   (Optional) configure `reticulate` to use the same Python environment by setting `RETICULATE_PYTHON` before running the R scripts.
+
+3. **Metadata resources** – the gene-centric conversion relies on ancillary mapping tables distributed with MONTI:
+
+   - `metadata/ensembl_gene_transcript_map.txt`
+   - `metadata/promoter_probes_illumina450.txt`
+   - `metadata/mirna_target_mirdb.txt`
+
+   Download these files from the original [MONTI tutorial package](http://cobi.knu.ac.kr/tools.php) and place them inside a local `metadata/` directory (or update the paths in `config/config.yml`).
+
+### Running the pipeline
+
+1. **Download TCGA BRCA data** (customise the project and query parameters in `config/config.yml`).
+
+   ```bash
+   Rscript pipelines/download_TCGA.R config/config.yml
+   ```
+
+   The script uses `TCGAbiolinks::GDCquery`, `GDCdownload`, and `GDCprepare` to fetch RNA-seq (HTSeq-FPKM), DNA methylation (Illumina 450K β-values), and miRNA-seq counts. Raw matrices are written to `data/` as CSV files alongside the raw `SummarizedExperiment` objects (`.rds`).
+
+2. **Generate gene-level matrices** via the MONTI utilities.
+
+   ```bash
+   Rscript pipelines/generate_gene_level.R config/config.yml
+   ```
+
+   This step calls `make_methylation_gcentric` and `make_mir_gcentric` from the Python `src/monti.py` module (through `reticulate`). Expression, methylation, and miRNA matrices are log2-transformed, quantile-normalised, and min–max scaled to [0, 1]. Harmonised matrices covering the intersecting genes and samples are stored under `output/`:
+
+   - `gene_expression_matrix.tsv`
+   - `gene_methylation_matrix.tsv`
+   - `gene_miRNA_matrix.tsv`
+
+3. **Build the MOPA tensor**.
+
+   ```bash
+   python pipelines/build_tensor.py --config config/config.yml
+   ```
+
+   The script stacks the three matrices into `output/tensor.npy`, writes `output/genelist.txt`, and records the sample IDs in `output/samplelist.txt`.
+
+### Outputs
+
+The processed artefacts in `output/` are ready for downstream tensor decomposition or pathway analysis with MOPA. Every run is controlled through `config/config.yml`, which exposes the TCGA project identifier, download parameters, raw input paths, and output filenames.
 
 Below is an illustration of the analysis workflow of MONTI.
 ![workflow](./images/monti_workflow.jpg)

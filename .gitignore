@@ -1,0 +1,15 @@
+# Data artefacts
+/data/*
+/output/*
+/metadata/*
+
+# Retain directory placeholders
+!data/.gitkeep
+!output/.gitkeep
+!metadata/.gitkeep
+
+# Large binary artefacts
+*.rds
+*.RDS
+*.npy
+*.npz
