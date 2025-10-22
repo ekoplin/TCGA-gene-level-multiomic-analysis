@@ -1,0 +1,40 @@
+# Default configuration for the TCGA multi-omics pipeline
+project: TCGA-BRCA
+
+# Directory layout
+data_dir: data
+output_dir: output
+
+# Raw inputs produced by pipelines/download_TCGA.R
+inputs:
+  rna: null          # falls back to data/<project>_rna_expression.csv
+  methylation: null  # falls back to data/<project>_dna_methylation.csv
+  mirna: null        # falls back to data/<project>_mirna_expression.csv
+
+# Metadata files required by MONTI gene-centric conversion utilities
+metadata:
+  mirna_targets: metadata/mirna_target_mirdb.txt
+  methylation_promoters: metadata/promoter_probes_illumina450.txt
+  gene_transcript_map: metadata/ensembl_gene_transcript_map.txt
+
+# Override the default GDC query parameters if desired
+# (see ?TCGAbiolinks::GDCquery for the full list of parameters)
+download:
+  rna:
+    data.category: Transcriptome Profiling
+    data.type: Gene Expression Quantification
+    workflow.type: HTSeq - FPKM
+  methylation:
+    data.category: DNA Methylation
+    platform: Illumina Human Methylation 450
+    legacy: true
+  mirna:
+    data.category: Transcriptome Profiling
+    data.type: miRNA Expression Quantification
+    workflow.type: BCGSC miRNA Profiling
+
+# Gene-level matrices produced by pipelines/generate_gene_level.R
+matrices:
+  expression: null      # falls back to output/gene_expression_matrix.tsv
+  methylation: null     # falls back to output/gene_methylation_matrix.tsv
+  mirna: null           # falls back to output/gene_miRNA_matrix.tsv
