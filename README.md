@@ -1,4 +1,7 @@
-# MONTI: A multi-omics non-negative tensor decomposition framework for gene-level integrative analysis
+# TCGA gene-level multi-omics analysis
+
+This repository was originally adapted from MONTI (Kim et al., 2021) but has been refactored into an independent project focused on TCGA gene-level multi-omics analysis.
+
 https://www.frontiersin.org/articles/10.3389/fgene.2021.682841/abstract
 
 Multi-omics data is frequently measured to characterize biological mechanisms underlying phenotypes. Complex relationships in multi-omics data, if mined, can lead to more accurate classification of patient samples according to the phenotypes.
@@ -137,6 +140,13 @@ The tutorial includes the below analysis procedures:
 * feature selection
 * classification accuracy measurement and
 * plotting of the results
+
+
+### Detaching the repository on GitHub
+
+If the GitHub web interface still lists this project as "forked from inukj/MONTI", open a support ticket via [GitHub Support](https://support.github.com/contact) using the **Repositories → Ownership and Permissions → Forked repository relationships** category and request detachment with a message such as:
+
+> Please detach my repository username/TCGA-gene-level-multiomic-analysis from its fork relationship with inukj/MONTI. I want to make it an independent project.
 
 
 
