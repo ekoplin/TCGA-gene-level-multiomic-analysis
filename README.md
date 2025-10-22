@@ -41,7 +41,7 @@ config/config.yml   # Pipeline configuration
    - `metadata/promoter_probes_illumina450.txt`
    - `metadata/mirna_target_mirdb.txt`
 
-   Download these files from the original [MONTI tutorial package](http://cobi.knu.ac.kr/tools.php) and place them inside a local `metadata/` directory (or update the paths in `config/config.yml`).
+   Use the scripts in [`scripts/`](./scripts) to generate these tables directly from the original sources (see [Metadata generation](#metadata-generation)).
 
 ### Running the pipeline
 
@@ -71,7 +71,21 @@ config/config.yml   # Pipeline configuration
    Rscript pipelines/build_tensor.R config/config.yml
    ```
 
-   The script stacks the three matrices into a 3D tensor saved as `output/tensor.rds` and records the intersecting gene list in `output/genelist.txt`.
+The script stacks the three matrices into a 3D tensor saved as `output/tensor.rds` and records the intersecting gene list in `output/genelist.txt`.
+
+### Metadata generation
+
+Generate the ancillary mapping tables with a single command:
+
+```bash
+Rscript scripts/generate_all_metadata.R
+```
+
+This script recreates the following files inside `metadata/`:
+
+- `metadata/ensembl_gene_transcript_map.txt`
+- `metadata/mirna_target_mirdb.txt`
+- `metadata/promoter_probes_illumina450.txt`
 
 ### Outputs
 
