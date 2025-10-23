@@ -23,7 +23,7 @@ download:
   rna:
     data.category: Transcriptome Profiling
     data.type: Gene Expression Quantification
-    workflow.type: HTSeq - FPKM
+    workflow.type: STAR - Counts
   methylation:
     data.category: DNA Methylation
     platform: Illumina Human Methylation 450

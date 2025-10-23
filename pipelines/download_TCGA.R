@@ -26,7 +26,7 @@ trim_barcodes <- function(barcodes) {
 write_matrix <- function(mat, path, id_label, strip_version = FALSE) {
   mat <- as.matrix(mat)
   if (strip_version) {
-    rownames(mat) <- sub("\\\..*$", "", rownames(mat))
+    rownames(mat) <- sub("\\..*$", "", rownames(mat))
   }
   if (anyDuplicated(rownames(mat))) {
     message("Collapsing duplicated identifiers in ", basename(path), " by averaging.")
@@ -57,12 +57,20 @@ fetch_and_save <- function(query_params, prefix, id_label, strip_version = FALSE
 }
 
 # RNA-seq
+# rna_params <- config$download$rna
+# if (is.null(rna_params)) {
+#   rna_params <- list(
+#     data.category = "Transcriptome Profiling",
+#     data.type = "Gene Expression Quantification",
+#     workflow.type = "HTSeq - FPKM"
+#   )
+# }
 rna_params <- config$download$rna
 if (is.null(rna_params)) {
   rna_params <- list(
     data.category = "Transcriptome Profiling",
     data.type = "Gene Expression Quantification",
-    workflow.type = "HTSeq - FPKM"
+    workflow.type = "STAR - Counts"
   )
 }
 fetch_and_save(rna_params, "rna_expression", "gene_id", strip_version = TRUE)
